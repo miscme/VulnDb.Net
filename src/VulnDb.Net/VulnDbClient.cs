@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -14,8 +15,8 @@ namespace VulnDb.Net
     public class VulnDbClient : IDisposable
     {
         private string BaseUrl { get; set; } = "https://vulndb.cyberriskanalytics.com";
-        private string ClientId { get; }
-        private string ClientSecret { get; }
+        private string? ClientId { get; }
+        private string? ClientSecret { get; }
         private readonly HttpClient _httpClient;
 
         
@@ -23,7 +24,7 @@ namespace VulnDb.Net
         {
         }
 
-        public VulnDbClient(string clientId, string clientSecret, string apiToken = null)
+        public VulnDbClient(string? clientId, string? clientSecret, string? apiToken = null)
         {
             var clientHandler = new HttpClientHandler();
             var cookieContainer = new CookieContainer();
@@ -80,10 +81,15 @@ namespace VulnDb.Net
         }
         
         private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod,
-            Object httpContent = null)
+            Object? payload = null)
         {
             using var request = new HttpRequestMessage(httpMethod, $"{BaseUrl}{url}");
-            request.Content ??= JsonContent.Create(httpContent);
+            if (payload != null)
+            {
+                var jsonPayload = JsonSerializer.Serialize(payload);
+                var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+                request.Content = content;
+            }
             return await _httpClient.SendAsync(request);
         }
 
