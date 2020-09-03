@@ -3,16 +3,17 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using VulnDb.Net.Models;
 
 namespace VulnDb.Net
 {
     public class VulnDbClient : IDisposable
     {
-        private string BaseUrl { get; set; } = "https://vulndb.cyberriskanalytics.com/";
+        private string BaseUrl { get; set; } = "https://vulndb.cyberriskanalytics.com";
         private string ClientId { get; }
         private string ClientSecret { get; }
         private readonly HttpClient _httpClient;
@@ -47,27 +48,42 @@ namespace VulnDb.Net
 
         public async Task<Token> GetTokenAsync()
         {
-            var credentials = new Auth
+            var response = await SendMessageAsync("/oauth/token", HttpMethod.Post, new Credentials
             {
                 ClientId = ClientId,
                 ClientSecret = ClientSecret
-            };
-            var payload = JsonConvert.SerializeObject(credentials);
-            var content = new StringContent(payload, Encoding.UTF8, "application/json");
-            var response = await SendMessageAsync("/oauth/token", HttpMethod.Post, content);
-            if (response == null || !response.IsSuccessStatusCode) return new Token();
-            await using var responseStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            using var sr = new StreamReader(responseStream, Encoding.UTF8);
-            using var jsonReader = new JsonTextReader(sr) {CloseInput = false};
-            var responseBody = await jsonReader.ReadAsStringAsync();
-            var token = JsonConvert.DeserializeObject<Token>(responseBody);
+            });
+            var token = await GetResponseObjectAsync(response) as Token;
             return token;
         }
-        
-        private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod, HttpContent httpContent = null)
+
+        private async Task<Object> GetResponseObjectAsync(HttpResponseMessage response)
         {
-            var request = new HttpRequestMessage(httpMethod, $"{BaseUrl}{url}");
-            request.Content ??= httpContent;
+            if (response.IsSuccessStatusCode) // TODO: Introduce error handling system
+            {
+                try
+                {
+                    var responseContent = await response.Content.ReadFromJsonAsync<Token>();
+                    return responseContent;
+                }
+                catch (NotSupportedException e)
+                {
+                    return null;
+                }
+                catch (JsonException)
+                {
+                    return null;
+                }
+            }
+
+            return null;
+        }
+        
+        private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod,
+            Object httpContent = null)
+        {
+            using var request = new HttpRequestMessage(httpMethod, $"{BaseUrl}{url}");
+            request.Content ??= JsonContent.Create(httpContent);
             return await _httpClient.SendAsync(request);
         }
 

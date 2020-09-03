@@ -1,19 +1,19 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace VulnDb.Net.Models
 {
-    public class Auth
+    public class Credentials
     {
-        [JsonProperty("client_id")]
+        [JsonPropertyName("client_id")]
         public string ClientId { get; set; }
 
-        [JsonProperty("client_secret")]
+        [JsonPropertyName("client_secret")]
         public string ClientSecret { get; set; }
 
-        [JsonProperty("grant_type")]
+        [JsonPropertyName("grant_type")]
         public string GrantType { get; } = "client_credentials";
     }
 }
