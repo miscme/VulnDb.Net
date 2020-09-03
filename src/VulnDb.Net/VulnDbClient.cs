@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,7 +15,8 @@ namespace VulnDb.Net
 {
     public class VulnDbClient : IDisposable
     {
-        private string BaseUrl { get; set; } = "https://vulndb.cyberriskanalytics.com";
+        private string BaseUrl { get; set; } = "https://vulndb.cyberriskanalytics.com/"; // TODO: Code set part to check for trailing / and add if not existent
+        private string ApiVersionUrl { get; set; } = "api/v1/";
         private string? ClientId { get; }
         private string? ClientSecret { get; }
         private readonly HttpClient _httpClient;
@@ -49,15 +51,22 @@ namespace VulnDb.Net
 
         public async Task<Token> GetTokenAsync()
         {
-            var response = await SendMessageAsync("/oauth/token", HttpMethod.Post, new Credentials
+            var response = await SendMessageAsync("oauth/token", HttpMethod.Post, new Credentials
             {
                 ClientId = ClientId,
                 ClientSecret = ClientSecret
             });
             var token = await GetResponseObjectAsync(response) as Token;
-            return token;
+            return token; // TODO: Add headers or cookies
         }
 
+        public async Task<Account> GetAccountStatusAsync()
+        {
+            var response = await SendMessageAsync("account_status", HttpMethod.Get);
+            var account = await GetResponseObjectAsync(response) as Account;
+            return account; // TODO: api return null or error???
+        }
+        
         private async Task<Object> GetResponseObjectAsync(HttpResponseMessage response)
         {
             if (response.IsSuccessStatusCode) // TODO: Introduce error handling system
@@ -83,7 +92,12 @@ namespace VulnDb.Net
         private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod,
             Object? payload = null)
         {
-            using var request = new HttpRequestMessage(httpMethod, $"{BaseUrl}{url}");
+            var reqUrl = $"{BaseUrl}{ApiVersionUrl}{url}";
+            if (url.Contains("token"))
+            {
+                reqUrl =  $"{BaseUrl}{url}";
+            }
+            using var request = new HttpRequestMessage(httpMethod, reqUrl);
             if (payload != null)
             {
                 var jsonPayload = JsonSerializer.Serialize(payload);
