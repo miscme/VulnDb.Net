@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace VulnDb.Net.Models
 {
-    public class VendorInformations
+    public class VendorInformations : IObjectInformations
     {
         /// <summary>
         /// The result set total count
@@ -54,7 +54,7 @@ namespace VulnDb.Net.Models
         public VendorInformation Vendor { get; set; }
     }
     
-    public class VendorInformation
+    public class VendorInformation : IObjectInformations
     {
         /// <summary>
         /// The vendor id

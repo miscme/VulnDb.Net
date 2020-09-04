@@ -1,8 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace VulnDb.Net.Models
 {
-    public class MergedIds
+    public class MergedIds : IObjectInformations
     {
         /// <summary>
         /// The result set total count

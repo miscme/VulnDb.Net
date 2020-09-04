@@ -2,7 +2,7 @@
 
 namespace VulnDb.Net.Models
 {
-    public class Account
+    public class Account : IObjectInformations
     {
         /// <summary>
         /// The current user's organization name

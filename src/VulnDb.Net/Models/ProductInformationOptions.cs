@@ -1,6 +1,6 @@
 ﻿namespace VulnDb.Net.Models
 {
-    public class ProductInformationOptions
+    public class ProductInformationOptions : IObjectOptions
     {
         /// <summary>
         /// When set to true, the Average Disclosure Interval for each product is returned, defaults to false.

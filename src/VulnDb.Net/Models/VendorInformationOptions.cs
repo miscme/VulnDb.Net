@@ -2,7 +2,7 @@
 
 namespace VulnDb.Net.Models
 {
-    public class VendorInformationOptions
+    public class VendorInformationOptions : IObjectOptions
     {
         /// <summary>
         /// When set to true, the Average Disclosure Interval for each vendor is returned, defaults to false.

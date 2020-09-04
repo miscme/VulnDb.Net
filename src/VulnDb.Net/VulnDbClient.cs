@@ -109,22 +109,22 @@ namespace VulnDb.Net
         /// <param name="url"></param>The url parameters passed from one of the vendor search methods
         /// <param name="options"></param>These options can be passed to any call to change its behavior
         /// <returns>VendorInformations Model</returns>
-        private async Task<VulnDbResponse<VendorInformations?>> GetVendorInformation<T>(string url, VendorInformationOptions? options = null)
-        {
-            var reqUrl = $@"vendors/{url}";
-            if (options == null)
-            {
-                var vendorInformationOptions = new VendorInformationOptions();
-                reqUrl = $@"{reqUrl}{vendorInformationOptions}";
-            }
-            else
-            {
-                reqUrl = $@"{reqUrl}{options}";
-            }
-            var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
-            var vulnDbResponse = await GetVulnDbObject<VendorInformations>(response);
-            return vulnDbResponse;
-        }
+        // private async Task<VulnDbResponse<VendorInformations?>> GetVendorInformation<T>(string url, VendorInformationOptions? options = null)
+        // {
+        //     var reqUrl = $@"vendors/{url}";
+        //     if (options == null)
+        //     {
+        //         var vendorInformationOptions = new VendorInformationOptions();
+        //         reqUrl = $@"{reqUrl}{vendorInformationOptions}";
+        //     }
+        //     else
+        //     {
+        //         reqUrl = $@"{reqUrl}{options}";
+        //     }
+        //     var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
+        //     var vulnDbResponse = await GetVulnDbObject<VendorInformations>(response);
+        //     return vulnDbResponse;
+        // }
         
         /// <summary>
         /// Returns max 5 results of vendors search by name.
@@ -136,7 +136,7 @@ namespace VulnDb.Net
             VendorInformationOptions? options = null)
         {
             var url = $@"by_name?vendor_name={vendorName}";
-            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
+            var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
         
@@ -150,7 +150,7 @@ namespace VulnDb.Net
             VendorInformationOptions? options = null)
         {
             var url = $@"{vendorId.ToString()}";
-            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
+            var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
         
@@ -166,7 +166,7 @@ namespace VulnDb.Net
             VendorInformationOptions? options = null, int size = 20, int page = 1)
         {
             var url = $@"by_product_id?product_id={productId.ToString()}&size={size.ToString()}&page={page.ToString()}";
-            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
+            var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
         
@@ -181,7 +181,7 @@ namespace VulnDb.Net
             int size = 20, int page = 1)
         {
             var url = $@"?size={size.ToString()}&page={page.ToString()}";
-            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
+            var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
         
@@ -200,7 +200,7 @@ namespace VulnDb.Net
         {
             var url =
                 $@"modified_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
-            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
+            var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
         
@@ -219,26 +219,19 @@ namespace VulnDb.Net
         {
             var url =
                 $@"new_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
-            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
+            var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
         #endregion
 
         #region Pulling Product Information
-        private async Task<VulnDbResponse<T?>> GetInformation<T, TU>(string url, TU? options = null) where T: class where TU: class 
-        {
-            var reqUrl = $@"vendors/{url}";
-            reqUrl = options == null ? $@"{reqUrl}{""}" : $@"{reqUrl}{options}";
-            var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
-            var vulnDbResponse = await GetVulnDbObject<T>(response);
-            return vulnDbResponse;
-        }
+
         
-        public async Task<VulnDbResponse<ProductInformations?>> GetProductByVendorId(int vendorId,
+        public async Task<VulnDbResponse<ProductInformationses?>> GetProductByVendorId(int vendorId,
             ProductInformationOptions? options = null, int size = 20, int page = 1)
         {
             var url = $@"by_vendor_id?vendor_id={vendorId.ToString()}&size={size.ToString()}&page={page.ToString()}";
-            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
+            var productInformation = await GetInformation<ProductInformationses, ProductInformationOptions>(url, options);
             return productInformation;
         }
         
@@ -253,7 +246,8 @@ namespace VulnDb.Net
         /// <param name="response"></param>Response from the request to VulnDb
         /// <typeparam name="T"></typeparam>Type of the response model
         /// <returns>Meta VulnDb Response Object</returns>
-        private async Task<VulnDbResponse<T?>> GetVulnDbObject<T>(HttpResponseMessage response) where T:class
+        private async Task<VulnDbResponse<T?>> GetVulnDbObject<T>(HttpResponseMessage response)
+            where T : class, IObjectInformations
         {
             VulnDbResponse<T?> vulnDbResponse;
             if (!response.IsSuccessStatusCode)
@@ -271,6 +265,16 @@ namespace VulnDb.Net
             var serializer = new JsonSerializerOptions {IgnoreNullValues = true};
             var responseModel = await response.Content.ReadFromJsonAsync<T?>(serializer);
             vulnDbResponse = new VulnDbResponse<T?>(responseModel, null);
+            return vulnDbResponse;
+        }
+        
+        private async Task<VulnDbResponse<T?>> GetInformation<T, TU>(string url, TU? options = null)
+            where T : class, IObjectInformations where TU : class, IObjectOptions 
+        {
+            var reqUrl = $@"vendors/{url}";
+            reqUrl = options == null ? $@"{reqUrl}{""}" : $@"{reqUrl}{options}";
+            var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
+            var vulnDbResponse = await GetVulnDbObject<T>(response);
             return vulnDbResponse;
         }
         
