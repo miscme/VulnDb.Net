@@ -109,7 +109,7 @@ namespace VulnDb.Net
         /// <param name="vendorName"></param>The vendor name to search for. Required
         /// <param name="options"></param>These options can be passed to any call to change its behavior
         /// <returns>VendorInformations Model</returns>
-        public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationByName(string vendorName,
+        public async Task<VulnDbResponse<VendorInformations?>> GetVendorByName(string vendorName,
             VendorInformationOptions? options = null)
         {
             var url = $@"vendors/by_name?vendor_name={vendorName}";
@@ -123,7 +123,7 @@ namespace VulnDb.Net
         /// <param name="vendorId"></param>The vendor id
         /// <param name="options"></param>These options can be passed to any call to change its behavior
         /// <returns>VendorInformations Model</returns>
-        public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationById(int vendorId,
+        public async Task<VulnDbResponse<VendorInformations?>> GetVendorById(int vendorId,
             VendorInformationOptions? options = null)
         {
             var url = $@"vendors/{vendorId.ToString()}";
@@ -139,7 +139,7 @@ namespace VulnDb.Net
         /// <param name="size"></param>The number of vendors to attempt returning, defaults to 20
         /// <param name="page"></param>The page number
         /// <returns>VendorInformations Model</returns>
-        public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationByProductId(int productId,
+        public async Task<VulnDbResponse<VendorInformations?>> GetVendorByProductId(int productId,
             VendorInformationOptions? options = null, int size = 20, int page = 1)
         {
             var url = $@"vendors/by_product_id?product_id={productId.ToString()}&size={size.ToString()}&page={page.ToString()}";
@@ -154,7 +154,7 @@ namespace VulnDb.Net
         /// <param name="size"></param>The number of vendors to attempt returning, defaults to 20
         /// <param name="page"></param>The page number
         /// <returns>VendorInformations Model</returns>
-        public async Task<VulnDbResponse<VendorInformations?>> GetVendorsInformation(VendorInformationOptions? options = null,
+        public async Task<VulnDbResponse<VendorInformations?>> GetVendors(VendorInformationOptions? options = null,
             int size = 20, int page = 1)
         {
             var url = $@"vendors/?size={size.ToString()}&page={page.ToString()}";
@@ -324,7 +324,6 @@ namespace VulnDb.Net
             var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
             return productInformation;
         }
-        
         #endregion
         #endregion
         
