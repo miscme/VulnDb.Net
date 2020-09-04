@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace VulnDb.Net.Models
 {
     public class Credentials
     {
+        /// <summary>
+        /// Your client id
+        /// </summary>
         [JsonPropertyName("client_id")]
         public string ClientId { get; set; }
 
+        /// <summary>
+        /// Your client secret
+        /// </summary>
         [JsonPropertyName("client_secret")]
         public string ClientSecret { get; set; }
 

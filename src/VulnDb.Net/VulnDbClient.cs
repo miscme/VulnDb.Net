@@ -1,11 +1,9 @@
 ﻿#nullable enable
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -49,9 +47,14 @@ namespace VulnDb.Net
             }
         }
 
+        #region API Requests
+        /// <summary>
+        /// POST /oauth/token:
+        /// Requests a new token for your user account and adds the received value as an Authentication Header.
+        /// </summary>
         public async Task GetTokenAsync()
         {
-            var response = await SendMessageAsync("oauth/token", HttpMethod.Post, new Credentials
+            var response = await SendMessageAsync("oauth/token", HttpMethod.Post, payload: new Credentials
             {
                 ClientId = ClientId,
                 ClientSecret = ClientSecret
@@ -62,17 +65,46 @@ namespace VulnDb.Net
                 new AuthenticationHeaderValue("Bearer", token.AccessToken);
         }
 
+        #region General API Information
+
+        /// <summary>
+        /// GET /api/v1/get_merged_ids?start_date=:start_date&end_date=:end_date:
+        /// Returns vendors, products and versions that have been merged within a date range.
+        /// The start_date parameter is required but the end_date is parameter is optional.
+        /// If the end_date parameter is omitted,
+        /// the records between start_date and the current date will be returned. 
+        /// </summary>
+        /// <param name="startDate">The start date (UTC), defaults to 10 years before today's d</param>
+        /// <param name="endDate">The end date (UTC), defaults to today's date</param>
+        /// <param name="size">The number of merged records to attempt returning, defaults to 20</param>
+        /// <param name="page">The page number</param>
+        /// <returns>MergedIds Model</returns>
+        public async Task<MergedIds> GetMergedIds(string startDate, string endDate = "", int size = 20, int page = 1)
+        {
+            return null;
+        }
+        
+        /// <summary>
+        /// GET /api/v1/account_status:
+        /// Returns status information on your user account,
+        /// including: organization name, username, e-mail address,
+        /// subscription end date, maximum number of allowed API calls per month,
+        /// API calls made for the current month and general VulnDB statistics. 
+        /// </summary>
+        /// <returns>Account Model</returns>
         public async Task<Account> GetAccountStatusAsync()
         {
             var response = await SendMessageAsync("account_status", HttpMethod.Get);
             var account = await response.Content.ReadFromJsonAsync<Account>();
             return account; // TODO: api return null or error???
         }
+        #endregion
+        #endregion
         
-        private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod,
+        private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod, string urlParams = "",
             Object? payload = null)
         {
-            var reqUrl = $"{BaseUrl}{ApiVersionUrl}{url}";
+            var reqUrl = $"{BaseUrl}{ApiVersionUrl}{url}{urlParams}";
             if (url.Contains("token"))
             {
                 reqUrl =  $"{BaseUrl}{url}";
