@@ -2,14 +2,14 @@
 
 namespace VulnDb.Net.Models
 {
-    public class MergedIds
+    public class VendorInformations
     {
         /// <summary>
         /// The result set total count
         /// </summary>
         [JsonPropertyName("total_entries")]
         public int TotalEntries { get; set; }
-
+        
         /// <summary>
         /// The current page, defaults to 1 if no page was set in the request
         /// </summary>
@@ -20,33 +20,33 @@ namespace VulnDb.Net.Models
         /// The results collection with the following parameters
         /// </summary>
         [JsonPropertyName("results")]
-        public MergedId[] Results { get; set; }
+        public VendorInformation[] Results { get; set; }
     }
     
-    public class MergedId
+    public class VendorInformation
     {
         /// <summary>
-        /// The database id for the merged record
+        /// The vendor id
         /// </summary>
         [JsonPropertyName("id")]
         public int Id { get; set; }
-
+        
         /// <summary>
-        /// The type of data that was merged (either vendor, product or version)
+        /// The vendor name
         /// </summary>
-        [JsonPropertyName("item_type")]
-        public string ItemType { get; set; }
-
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+        
         /// <summary>
-        /// The id of the vendor, product or version that was removed
+        /// The vendor short name
         /// </summary>
-        [JsonPropertyName("source_id")]
-        public int SourceId { get; set; }
-
+        [JsonPropertyName("short_name")]
+        public string ShortName { get; set; }
+        
         /// <summary>
-        /// The id of the vendor, product or version that was merged into
+        /// The vendor url
         /// </summary>
-        [JsonPropertyName("destination_id")]
-        public int DestinationId { get; set; }
+        [JsonPropertyName("vendor_url")]
+        public string VendorUrl { get; set; }
     }
 }

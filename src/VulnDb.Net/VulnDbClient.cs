@@ -66,24 +66,6 @@ namespace VulnDb.Net
         }
 
         #region General API Information
-
-        /// <summary>
-        /// GET /api/v1/get_merged_ids?start_date=:start_date&end_date=:end_date:
-        /// Returns vendors, products and versions that have been merged within a date range.
-        /// The start_date parameter is required but the end_date is parameter is optional.
-        /// If the end_date parameter is omitted,
-        /// the records between start_date and the current date will be returned. 
-        /// </summary>
-        /// <param name="startDate">The start date (UTC), defaults to 10 years before today's d</param>
-        /// <param name="endDate">The end date (UTC), defaults to today's date</param>
-        /// <param name="size">The number of merged records to attempt returning, defaults to 20</param>
-        /// <param name="page">The page number</param>
-        /// <returns>MergedIds Model</returns>
-        public async Task<MergedIds> GetMergedIds(string startDate, string endDate = "", int size = 20, int page = 1)
-        {
-            return null;
-        }
-        
         /// <summary>
         /// GET /api/v1/account_status:
         /// Returns status information on your user account,
@@ -98,13 +80,151 @@ namespace VulnDb.Net
             var account = await response.Content.ReadFromJsonAsync<Account>();
             return account; // TODO: api return null or error???
         }
+        
+        /// <summary>
+        /// GET /api/v1/get_merged_ids?start_date=:start_date&end_date=:end_date:
+        /// Returns vendors, products and versions that have been merged within a date range.
+        /// The start_date(ISO 8601) parameter is required but the end_date is parameter is optional.
+        /// If the end_date(ISO 8601) parameter is omitted,
+        /// the records between start_date and the current date will be returned. 
+        /// </summary>
+        /// <param name="startDate">The start date (UTC), defaults to 10 years before today's d</param>
+        /// <param name="endDate">The end date (UTC), defaults to today's date</param>
+        /// <param name="size">The number of merged records to attempt returning, defaults to 20</param>
+        /// <param name="page">The page number</param>
+        /// <returns>MergedIds Model</returns>
+        public async Task<MergedIds> GetMergedIds(string startDate = "", string endDate = "", int size = 20, int page = 1)
+        {
+            var urlParams = $@"start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
+            var response = await SendMessageAsync("get_merged_ids", HttpMethod.Get, urlParams);
+            var mergedIds = await response.Content.ReadFromJsonAsync<MergedIds>();
+            return mergedIds;
+        }
+        #endregion
+
+        #region Pulling Vendor Information
+        private async Task<VendorInformations> GetVendorInformation(string url, VendorInformationOptions? options = null)
+        {
+            var reqUrl = $@"vendors/{url}";
+            if (options == null)
+            {
+                var vendorInformationOptions = new VendorInformationOptions();
+                reqUrl = $@"{reqUrl}{vendorInformationOptions}";
+            }
+            var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
+            var vendorInformation = await response.Content.ReadFromJsonAsync<VendorInformations>();
+            return vendorInformation;
+        }
+        
+        /// <summary>
+        /// Returns max 5 results of vendors search by name.
+        /// </summary>
+        /// <param name="vendorName"></param>The vendor name to search for. Required
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <returns>VendorInformations Model</returns>
+        public async Task<VendorInformations> GetVendorInformationByName(string vendorName,
+            VendorInformationOptions? options = null)
+        {
+            var url = $@"by_name?vendor_name={vendorName}";
+            var vendorInformation = await GetVendorInformation(url, options);
+            return vendorInformation;
+        }
+        
+        /// <summary>
+        /// Returns all the vendors associated with a given product id.
+        /// </summary>
+        /// <param name="vendorId"></param>The product id
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <param name="size"></param>The page number
+        /// <param name="page"></param>The number of vendors to attempt returning, defaults to 20
+        /// <returns></returns>
+        public async Task<VendorInformations> GetVendorInformationById(int vendorId,
+            VendorInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"{vendorId.ToString()}&{size.ToString()}&{page.ToString()}";
+            var vendorInformation = await GetVendorInformation(url, options);
+            return vendorInformation;
+        }
+        
+        /// <summary>
+        /// Returns all the vendors associated with a given product id.
+        /// </summary>
+        /// <param name="productId"></param>The product id
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <param name="size"></param>The number of vendors to attempt returning, defaults to 20
+        /// <param name="page"></param>The page number
+        /// <returns></returns>
+        public async Task<VendorInformations> GetVendorInformationByProductId(int productId,
+            VendorInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"by_product_id?product_id={productId.ToString()}&{size.ToString()}&{page.ToString()}";
+            var vendorInformation = await GetVendorInformation(url, options);
+            return vendorInformation;
+        }
+        
+        /// <summary>
+        /// Returns 20 vendors ordered by name.
+        /// </summary>
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <param name="size"></param>The number of vendors to attempt returning, defaults to 20
+        /// <param name="page"></param>The page number
+        /// <returns></returns>
+        public async Task<VendorInformations> GetVendorInformationAll(VendorInformationOptions? options = null,
+            int size = 20, int page = 1)
+        {
+            var url = $@"?size={size.ToString()}&page={page.ToString()}";
+            var vendorInformation = await GetVendorInformation(url, options);
+            return vendorInformation;
+        }
+        
+        /// <summary>
+        /// Returns all the updated vendors within a date range.
+        /// Set the start_date parameter to be 2015-12-1 or later to receive the most accurate results.
+        /// </summary>
+        /// <param name="startDate"></param>The start date (UTC), defaults to 1 week ago
+        /// <param name="endDate"></param>The end date (UTC), defaults to today
+        /// <param name="options"></param>
+        /// <param name="size"></param>The number of vendors to attempt returning, defaults to 1
+        /// <param name="page"></param>The page number
+        /// <returns></returns>
+        public async Task<VendorInformations> GetVendorModified(string startDate = "", string endDate = "",
+            VendorInformationOptions? options = null, int size = 1, int page = 1)
+        {
+            var url =
+                $@"modified_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
+            var vendorInformation = await GetVendorInformation(url, options);
+            return vendorInformation;
+        }
+        
+        /// <summary>
+        /// Returns all the newly created vendors within a date range.
+        /// Set the start_date parameter to be 2015-12-1 or later to receive the most accurate results.
+        /// </summary>
+        /// <param name="startDate"></param>The start date (UTC), defaults to 1 week ago
+        /// <param name="endDate"></param>The end date (UTC), defaults to today
+        /// <param name="options"></param>
+        /// <param name="size"></param>The number of vendors to attempt returning, defaults to 1
+        /// <param name="page"></param>The page number
+        /// <returns></returns>
+        public async Task<VendorInformations> GetVendorNew(string startDate = "", string endDate = "",
+            VendorInformationOptions? options = null, int size = 1, int page = 1)
+        {
+            var url =
+                $@"new_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
+            var vendorInformation = await GetVendorInformation(url, options);
+            return vendorInformation;
+        }
         #endregion
         #endregion
         
         private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod, string urlParams = "",
             Object? payload = null)
         {
-            var reqUrl = $"{BaseUrl}{ApiVersionUrl}{url}{urlParams}";
+            var reqUrl = $"{BaseUrl}{ApiVersionUrl}{url}";
+            if (urlParams != "")
+            {
+                reqUrl = $"{BaseUrl}{ApiVersionUrl}{url}?{urlParams}";
+            }
             if (url.Contains("token"))
             {
                 reqUrl =  $"{BaseUrl}{url}";
