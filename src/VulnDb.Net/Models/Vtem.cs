@@ -1,0 +1,13 @@
+﻿using System.Text.Json.Serialization;
+
+namespace VulnDb.Net.Models
+{
+    public class Vtem
+    {
+        [JsonPropertyName("vtem_name")]
+        public string VtemName { get; set; }
+
+        [JsonPropertyName("vtem_metric")]
+        public int VtemMetric { get; set; }
+    }
+}

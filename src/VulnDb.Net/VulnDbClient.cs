@@ -64,25 +64,6 @@ namespace VulnDb.Net
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token.AccessToken);
         }
-
-        private async Task<VulnDbResponse<T?>> GetVulnDbObject<T>(HttpResponseMessage response) where T:class
-        {
-            VulnDbResponse<T?> vulnDbResponse;
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorString = await response.Content.ReadAsStringAsync();
-                ErrorResponse? error = null;
-                if (errorString != null)
-                {
-                    error = JsonSerializer.Deserialize<ErrorResponse>(errorString);
-                }
-                vulnDbResponse = new VulnDbResponse<T?>(null, error);
-                return vulnDbResponse;
-            }            
-            var responseModel = await response.Content.ReadFromJsonAsync<T?>();
-            vulnDbResponse = new VulnDbResponse<T?>(responseModel, null);
-            return vulnDbResponse;
-        }
         
         #region General API Information
         /// <summary>
@@ -122,13 +103,23 @@ namespace VulnDb.Net
         #endregion
 
         #region Pulling Vendor Information
-        private async Task<VulnDbResponse<VendorInformations?>> GetVendorInformation(string url, VendorInformationOptions? options = null)
+        /// <summary>
+        /// Return results of vendor search
+        /// </summary>
+        /// <param name="url"></param>The url parameters passed from one of the vendor search methods
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <returns>VendorInformations Model</returns>
+        private async Task<VulnDbResponse<VendorInformations?>> GetVendorInformation<T>(string url, VendorInformationOptions? options = null)
         {
             var reqUrl = $@"vendors/{url}";
             if (options == null)
             {
                 var vendorInformationOptions = new VendorInformationOptions();
                 reqUrl = $@"{reqUrl}{vendorInformationOptions}";
+            }
+            else
+            {
+                reqUrl = $@"{reqUrl}{options}";
             }
             var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
             var vulnDbResponse = await GetVulnDbObject<VendorInformations>(response);
@@ -145,23 +136,21 @@ namespace VulnDb.Net
             VendorInformationOptions? options = null)
         {
             var url = $@"by_name?vendor_name={vendorName}";
-            var vendorInformation = await GetVendorInformation(url, options);
+            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
             return vendorInformation;
         }
         
         /// <summary>
-        /// Returns all the vendors associated with a given product id.
+        /// Returns vendor by id. Http status code 404 will be returned if no vendor matches the vendor_id.
         /// </summary>
-        /// <param name="vendorId"></param>The product id
+        /// <param name="vendorId"></param>The vendor id
         /// <param name="options"></param>These options can be passed to any call to change its behavior
-        /// <param name="size"></param>The page number
-        /// <param name="page"></param>The number of vendors to attempt returning, defaults to 20
-        /// <returns></returns>
+        /// <returns>VendorInformations Model</returns>
         public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationById(int vendorId,
-            VendorInformationOptions? options = null, int size = 20, int page = 1)
+            VendorInformationOptions? options = null)
         {
-            var url = $@"{vendorId.ToString()}&{size.ToString()}&{page.ToString()}";
-            var vendorInformation = await GetVendorInformation(url, options);
+            var url = $@"{vendorId.ToString()}";
+            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
             return vendorInformation;
         }
         
@@ -172,12 +161,12 @@ namespace VulnDb.Net
         /// <param name="options"></param>These options can be passed to any call to change its behavior
         /// <param name="size"></param>The number of vendors to attempt returning, defaults to 20
         /// <param name="page"></param>The page number
-        /// <returns></returns>
+        /// <returns>VendorInformations Model</returns>
         public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationByProductId(int productId,
             VendorInformationOptions? options = null, int size = 20, int page = 1)
         {
             var url = $@"by_product_id?product_id={productId.ToString()}&size={size.ToString()}&page={page.ToString()}";
-            var vendorInformation = await GetVendorInformation(url, options);
+            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
             return vendorInformation;
         }
         
@@ -187,12 +176,12 @@ namespace VulnDb.Net
         /// <param name="options"></param>These options can be passed to any call to change its behavior
         /// <param name="size"></param>The number of vendors to attempt returning, defaults to 20
         /// <param name="page"></param>The page number
-        /// <returns></returns>
+        /// <returns>VendorInformations Model</returns>
         public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationAll(VendorInformationOptions? options = null,
             int size = 20, int page = 1)
         {
             var url = $@"?size={size.ToString()}&page={page.ToString()}";
-            var vendorInformation = await GetVendorInformation(url, options);
+            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
             return vendorInformation;
         }
         
@@ -205,13 +194,13 @@ namespace VulnDb.Net
         /// <param name="options"></param>
         /// <param name="size"></param>The number of vendors to attempt returning, defaults to 1
         /// <param name="page"></param>The page number
-        /// <returns></returns>
+        /// <returns>VendorInformations Model</returns>
         public async Task<VulnDbResponse<VendorInformations?>> GetVendorModified(string startDate = "", string endDate = "",
             VendorInformationOptions? options = null, int size = 1, int page = 1)
         {
             var url =
                 $@"modified_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
-            var vendorInformation = await GetVendorInformation(url, options);
+            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
             return vendorInformation;
         }
         
@@ -224,18 +213,75 @@ namespace VulnDb.Net
         /// <param name="options"></param>
         /// <param name="size"></param>The number of vendors to attempt returning, defaults to 1
         /// <param name="page"></param>The page number
-        /// <returns></returns>
+        /// <returns>VendorInformations Model</returns>
         public async Task<VulnDbResponse<VendorInformations?>> GetVendorNew(string startDate = "", string endDate = "",
             VendorInformationOptions? options = null, int size = 1, int page = 1)
         {
             var url =
                 $@"new_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
-            var vendorInformation = await GetVendorInformation(url, options);
+            var vendorInformation = await GetVendorInformation<VendorInformations>(url, options);
             return vendorInformation;
         }
         #endregion
+
+        #region Pulling Product Information
+        private async Task<VulnDbResponse<T?>> GetInformation<T, TU>(string url, TU? options = null) where T: class where TU: class 
+        {
+            var reqUrl = $@"vendors/{url}";
+            reqUrl = options == null ? $@"{reqUrl}{""}" : $@"{reqUrl}{options}";
+            var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
+            var vulnDbResponse = await GetVulnDbObject<T>(response);
+            return vulnDbResponse;
+        }
+        
+        public async Task<VulnDbResponse<ProductInformations?>> GetProductByVendorId(int vendorId,
+            ProductInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"by_vendor_id?vendor_id={vendorId.ToString()}&size={size.ToString()}&page={page.ToString()}";
+            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
+            return productInformation;
+        }
+        
+        #endregion
         #endregion
         
+        #region API Request Helper Methods
+        /// <summary>
+        /// Creates the meta response object,
+        /// created to provide a consistent return type and encapsulate possible errors.
+        /// </summary>
+        /// <param name="response"></param>Response from the request to VulnDb
+        /// <typeparam name="T"></typeparam>Type of the response model
+        /// <returns>Meta VulnDb Response Object</returns>
+        private async Task<VulnDbResponse<T?>> GetVulnDbObject<T>(HttpResponseMessage response) where T:class
+        {
+            VulnDbResponse<T?> vulnDbResponse;
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorString = await response.Content.ReadAsStringAsync();
+                ErrorResponse? error = null;
+                if (errorString != null)
+                {
+                    error = JsonSerializer.Deserialize<ErrorResponse>(errorString);
+                }
+
+                vulnDbResponse = new VulnDbResponse<T?>(null, error);
+                return vulnDbResponse;
+            }
+            var serializer = new JsonSerializerOptions {IgnoreNullValues = true};
+            var responseModel = await response.Content.ReadFromJsonAsync<T?>(serializer);
+            vulnDbResponse = new VulnDbResponse<T?>(responseModel, null);
+            return vulnDbResponse;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="url"></param>The request url
+        /// <param name="httpMethod"></param>The http method to use
+        /// <param name="urlParams"></param>The optional url parameters to use
+        /// <param name="payload"></param>The optional payload to attach
+        /// <returns></returns>
         private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod, string urlParams = "",
             object? payload = null)
         {
@@ -257,6 +303,7 @@ namespace VulnDb.Net
             }
             return await _httpClient.SendAsync(request);
         }
+        #endregion
         
         public void Dispose()
         {
