@@ -49,44 +49,24 @@ namespace VulnDb.Net
             }
         }
 
-        public async Task<Token> GetTokenAsync()
+        public async Task GetTokenAsync()
         {
             var response = await SendMessageAsync("oauth/token", HttpMethod.Post, new Credentials
             {
                 ClientId = ClientId,
                 ClientSecret = ClientSecret
             });
-            var token = await GetResponseObjectAsync(response) as Token;
-            return token; // TODO: Add headers or cookies
+
+            var token = await response.Content.ReadFromJsonAsync<Token>(); // TODO: try catch?
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token.AccessToken);
         }
 
         public async Task<Account> GetAccountStatusAsync()
         {
             var response = await SendMessageAsync("account_status", HttpMethod.Get);
-            var account = await GetResponseObjectAsync(response) as Account;
+            var account = await response.Content.ReadFromJsonAsync<Account>();
             return account; // TODO: api return null or error???
-        }
-        
-        private async Task<Object> GetResponseObjectAsync(HttpResponseMessage response)
-        {
-            if (response.IsSuccessStatusCode) // TODO: Introduce error handling system
-            {
-                try
-                {
-                    var responseContent = await response.Content.ReadFromJsonAsync<Token>();
-                    return responseContent;
-                }
-                catch (NotSupportedException e)
-                {
-                    return null;
-                }
-                catch (JsonException)
-                {
-                    return null;
-                }
-            }
-
-            return null;
         }
         
         private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod,
