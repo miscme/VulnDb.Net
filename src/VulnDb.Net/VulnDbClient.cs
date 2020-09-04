@@ -104,29 +104,6 @@ namespace VulnDb.Net
 
         #region Pulling Vendor Information
         /// <summary>
-        /// Return results of vendor search
-        /// </summary>
-        /// <param name="url"></param>The url parameters passed from one of the vendor search methods
-        /// <param name="options"></param>These options can be passed to any call to change its behavior
-        /// <returns>VendorInformations Model</returns>
-        // private async Task<VulnDbResponse<VendorInformations?>> GetVendorInformation<T>(string url, VendorInformationOptions? options = null)
-        // {
-        //     var reqUrl = $@"vendors/{url}";
-        //     if (options == null)
-        //     {
-        //         var vendorInformationOptions = new VendorInformationOptions();
-        //         reqUrl = $@"{reqUrl}{vendorInformationOptions}";
-        //     }
-        //     else
-        //     {
-        //         reqUrl = $@"{reqUrl}{options}";
-        //     }
-        //     var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
-        //     var vulnDbResponse = await GetVulnDbObject<VendorInformations>(response);
-        //     return vulnDbResponse;
-        // }
-        
-        /// <summary>
         /// Returns max 5 results of vendors search by name.
         /// </summary>
         /// <param name="vendorName"></param>The vendor name to search for. Required
@@ -135,7 +112,7 @@ namespace VulnDb.Net
         public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationByName(string vendorName,
             VendorInformationOptions? options = null)
         {
-            var url = $@"by_name?vendor_name={vendorName}";
+            var url = $@"vendors/by_name?vendor_name={vendorName}";
             var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
@@ -149,7 +126,7 @@ namespace VulnDb.Net
         public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationById(int vendorId,
             VendorInformationOptions? options = null)
         {
-            var url = $@"{vendorId.ToString()}";
+            var url = $@"vendors/{vendorId.ToString()}";
             var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
@@ -165,7 +142,7 @@ namespace VulnDb.Net
         public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationByProductId(int productId,
             VendorInformationOptions? options = null, int size = 20, int page = 1)
         {
-            var url = $@"by_product_id?product_id={productId.ToString()}&size={size.ToString()}&page={page.ToString()}";
+            var url = $@"vendors/by_product_id?product_id={productId.ToString()}&size={size.ToString()}&page={page.ToString()}";
             var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
@@ -177,10 +154,10 @@ namespace VulnDb.Net
         /// <param name="size"></param>The number of vendors to attempt returning, defaults to 20
         /// <param name="page"></param>The page number
         /// <returns>VendorInformations Model</returns>
-        public async Task<VulnDbResponse<VendorInformations?>> GetVendorInformationAll(VendorInformationOptions? options = null,
+        public async Task<VulnDbResponse<VendorInformations?>> GetVendorsInformation(VendorInformationOptions? options = null,
             int size = 20, int page = 1)
         {
-            var url = $@"?size={size.ToString()}&page={page.ToString()}";
+            var url = $@"vendors/?size={size.ToString()}&page={page.ToString()}";
             var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
@@ -191,7 +168,7 @@ namespace VulnDb.Net
         /// </summary>
         /// <param name="startDate"></param>The start date (UTC), defaults to 1 week ago
         /// <param name="endDate"></param>The end date (UTC), defaults to today
-        /// <param name="options"></param>
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
         /// <param name="size"></param>The number of vendors to attempt returning, defaults to 1
         /// <param name="page"></param>The page number
         /// <returns>VendorInformations Model</returns>
@@ -199,7 +176,7 @@ namespace VulnDb.Net
             VendorInformationOptions? options = null, int size = 1, int page = 1)
         {
             var url =
-                $@"modified_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
+                $@"vendors/modified_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
             var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
@@ -210,7 +187,7 @@ namespace VulnDb.Net
         /// </summary>
         /// <param name="startDate"></param>The start date (UTC), defaults to 1 week ago
         /// <param name="endDate"></param>The end date (UTC), defaults to today
-        /// <param name="options"></param>
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
         /// <param name="size"></param>The number of vendors to attempt returning, defaults to 1
         /// <param name="page"></param>The page number
         /// <returns>VendorInformations Model</returns>
@@ -218,20 +195,133 @@ namespace VulnDb.Net
             VendorInformationOptions? options = null, int size = 1, int page = 1)
         {
             var url =
-                $@"new_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
+                $@"vendors/new_vendors?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
             var vendorInformation = await GetInformation<VendorInformations, VendorInformationOptions>(url, options);
             return vendorInformation;
         }
         #endregion
 
         #region Pulling Product Information
-
-        
-        public async Task<VulnDbResponse<ProductInformationses?>> GetProductByVendorId(int vendorId,
+        /// <summary>
+        /// Returns 20 products ordered by name.
+        /// </summary>
+        /// <param name="vendorId"></param>The vendor id
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <param name="size"></param>The number of products to attempt returning, defaults to 20
+        /// <param name="page"></param>The page number
+        /// <returns></returns>
+        public async Task<VulnDbResponse<ProductInformations?>> GetProductByVendorId(int vendorId,
             ProductInformationOptions? options = null, int size = 20, int page = 1)
         {
-            var url = $@"by_vendor_id?vendor_id={vendorId.ToString()}&size={size.ToString()}&page={page.ToString()}";
-            var productInformation = await GetInformation<ProductInformationses, ProductInformationOptions>(url, options);
+            var url = $@"vendors/by_vendor_id?vendor_id={vendorId.ToString()}&size={size.ToString()}&page={page.ToString()}";
+            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
+            return productInformation;
+        }
+
+        /// <summary>
+        /// Returns max 5 products ordered by name.
+        /// </summary>
+        /// <param name="productName"></param>The product name to search for
+        /// <param name="vendorId"></param>The vendor id
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <returns></returns>
+        public async Task<VulnDbResponse<ProductInformations?>> GetProductByIdAndProductName(string productName,
+            int vendorId, ProductInformationOptions? options = null)
+        {
+            var url = $@"vendors/by_vendor_id_and_product_name?product_name={productName}&vendor_id={vendorId.ToString()}";
+            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
+            return productInformation;
+        }
+        
+        /// <summary>
+        /// Returns max 5 products ordered by name.
+        /// </summary>
+        /// <param name="productName"></param>The product name to search for
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <returns></returns>
+        public async Task<VulnDbResponse<ProductInformations?>> GetProductByIdAndProductName(string productName,
+            ProductInformationOptions? options = null)
+        {
+            var url = $@"vendors/by_vendor_id_and_product_name?product_name={productName}&vendor_id={""}";
+            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
+            return productInformation;
+        }
+
+        /// <summary>
+        /// Returns 20 products ordered by name.
+        /// </summary>
+        /// <param name="vendorName"></param>The vendor name. Required parameter
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <param name="size"></param>The number of products to attempt returning, defaults to 20
+        /// <param name="page"></param>The page number. Defaults to 1.
+        /// <returns></returns>
+        public async Task<VulnDbResponse<ProductInformations?>> GetProductByVendorName(string vendorName,
+            ProductInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"products/by_vendor_name?vendor_name={vendorName}?size={size.ToString()}&page={page.ToString()}";
+            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
+            return productInformation;
+        }
+        
+        /// <summary>
+        /// Returns 20 products ordered by name.
+        /// </summary>
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <param name="size"></param>The number of products to attempt returning, defaults to 20
+        /// <param name="page"></param>The page number
+        /// <returns></returns>
+        public async Task<VulnDbResponse<ProductInformations?>> GetProducts(ProductInformationOptions? options = null,
+            int size = 20, int page = 1)
+        {
+            var url = $@"products/?size={size.ToString()}&page={page.ToString()}";
+            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
+            return productInformation;
+        }
+        
+        /// <summary>
+        /// Returns all the updated products within a date range. Set the start_date parameter to be 2015-12-1 or later to receive the most accurate results
+        /// </summary>
+        /// <param name="startDate"></param>The start date (UTC), defaults to 1 week ago
+        /// <param name="endDate"></param>The end date (UTC), defaults to today
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <param name="size"></param>The number of products to attempt returning, defaults to 20
+        /// <param name="page"></param>The page number
+        /// <returns></returns>
+        public async Task<VulnDbResponse<ProductInformations?>> GetProductsModified(string startDate = "", string endDate = "", ProductInformationOptions? options = null,
+            int size = 20, int page = 1)
+        {
+            var url = $@"products/modified_products?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
+            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
+            return productInformation;
+        }
+        
+        /// <summary>
+        /// Returns all the newly created products within a date range. Set the start_date parameter to be 2015-12-1 or later to receive the most accurate results
+        /// </summary>
+        /// <param name="startDate"></param>The start date (UTC), defaults to 1 week ago
+        /// <param name="endDate"></param>The end date (UTC), defaults to today
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <param name="size"></param>The number of products to attempt returning, defaults to 20
+        /// <param name="page"></param>The page number
+        /// <returns></returns>
+        public async Task<VulnDbResponse<ProductInformations?>> GetProductsNew(string startDate = "", string endDate = "", ProductInformationOptions? options = null,
+            int size = 20, int page = 1)
+        {
+            var url = $@"products/new_products?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
+            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
+            return productInformation;
+        }
+        
+        /// <summary>
+        /// Returns product by id.
+        /// </summary>
+        /// <param name="productId"></param>The product id
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <returns></returns>
+        public async Task<VulnDbResponse<ProductInformations?>> GetProductsById(int productId, ProductInformationOptions? options = null)
+        {
+            var url = $@"products/{productId.ToString()}";
+            var productInformation = await GetInformation<ProductInformations, ProductInformationOptions>(url, options);
             return productInformation;
         }
         
@@ -258,7 +348,6 @@ namespace VulnDb.Net
                 {
                     error = JsonSerializer.Deserialize<ErrorResponse>(errorString);
                 }
-
                 vulnDbResponse = new VulnDbResponse<T?>(null, error);
                 return vulnDbResponse;
             }
@@ -268,10 +357,18 @@ namespace VulnDb.Net
             return vulnDbResponse;
         }
         
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="url"></param>The call identifier url
+        /// <param name="options"></param>These options can be passed to any call to change its behavior
+        /// <typeparam name="T"></typeparam>The model type
+        /// <typeparam name="TU"></typeparam>The options model type
+        /// <returns></returns>
         private async Task<VulnDbResponse<T?>> GetInformation<T, TU>(string url, TU? options = null)
             where T : class, IObjectInformations where TU : class, IObjectOptions 
         {
-            var reqUrl = $@"vendors/{url}";
+            var reqUrl = $@"{url}";
             reqUrl = options == null ? $@"{reqUrl}{""}" : $@"{reqUrl}{options}";
             var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
             var vulnDbResponse = await GetVulnDbObject<T>(response);
@@ -279,7 +376,7 @@ namespace VulnDb.Net
         }
         
         /// <summary>
-        /// 
+        /// Sends request and constructs url
         /// </summary>
         /// <param name="url"></param>The request url
         /// <param name="httpMethod"></param>The http method to use

@@ -3,7 +3,7 @@ using VulnDb.Net.Models;
 
 namespace VulnDb.Net.Models
 {
-    public class ProductInformationses : IObjectInformations
+    public class ProductInformations : IObjectInformations
     {
         /// <summary>
         /// The result set total count
