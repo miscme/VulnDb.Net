@@ -1,0 +1,95 @@
+﻿using System;
+using System.Text.Json.Serialization;
+
+namespace VulnDb.Net.Models
+{
+    public class VulneratbilityInformation
+    {
+        [JsonPropertyName("vulndb_id")]
+        public int VulnDbId { get; set; }
+
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
+
+        [JsonPropertyName("keywords")]
+        public string Keywords { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("solution")]
+        public string Solution { get; set; }
+
+        [JsonPropertyName("vulndb_published_date")]
+        public DateTime VulnDbPublishedDate { get; set; }
+
+        [JsonPropertyName("vulndb_last_modified")]
+        public DateTime VulnDbLastModified { get; set; }
+
+        [JsonPropertyName("manual_notes")]
+        public string ManualNotes { get; set; }
+
+        [JsonPropertyName("t_description")]
+        public string TDescription { get; set; }
+
+        [JsonPropertyName("solution_date")]
+        public DateTime SolutionDate { get; set; }
+
+        [JsonPropertyName("disclosure_date")]
+        public DateTime DisclosureDate { get; set; }
+
+        [JsonPropertyName("discovery_date")]
+        public string DiscoveryDate { get; set; }
+
+        [JsonPropertyName("exploit_publish_date")]
+        public string ExploitPublishDate { get; set; }
+
+        [JsonPropertyName("vendor_informed_date")]
+        public string VendorInformedDate { get; set; }
+
+        [JsonPropertyName("vendor_ack_date")]
+        public string VendorAckDate { get; set; }
+
+        [JsonPropertyName("third_party_solution_date")]
+        public string ThirdPartySolutionDate { get; set; }
+
+        [JsonPropertyName("ext_references")]
+        public ExtReference[] ExtReferences { get; set; }
+
+        [JsonPropertyName("cvss_metrics")]
+        public CvssMetric[] CvssMetrics { get; set; }
+
+        [JsonPropertyName("cvss_version_three_metrics")]
+        public CvssVersionThreeMetric[] CvssVersionThreeMetrics { get; set; }
+
+        [JsonPropertyName("vendors")]
+        public VendorInformation Vendors { get; set; }
+
+        [JsonPropertyName("packages")]
+        public string[] Packages { get; set; } //assumed data type to be string
+
+        [JsonPropertyName("libraries")]
+        public Libraries Libraries { get; set; }
+
+        [JsonPropertyName("nvd_additional_information")]
+        public string[] NvdAdditionalInformation { get; set; } //assumed data type to be string
+
+        [JsonPropertyName("nvd_additional_information_v2")]
+        public string[] NvdAdditionalInformationV2 { get; set; } //assumed data type to be string
+
+        [JsonPropertyName("vtems")]
+        public Vtem[] Vtems { get; set; }
+
+        [JsonPropertyName("changelog")]
+        public Changelog[] Changelog { get; set; }
+
+        [JsonPropertyName("classifications")]
+        public Classification[] Classifications { get; set; }
+
+        [JsonPropertyName("authors")]
+        public Authors[] Authors { get; set; }
+        
+        [JsonPropertyName("products")]
+        public ProductInformation[] Products { get; set; }
+    }
+}

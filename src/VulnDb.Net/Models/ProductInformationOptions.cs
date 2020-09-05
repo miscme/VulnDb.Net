@@ -5,27 +5,27 @@
         /// <summary>
         /// When set to true, the Average Disclosure Interval for each product is returned, defaults to false.
         /// </summary>
-        private bool AverageDisclosureInterval { get; set; }
+        public bool AverageDisclosureInterval { get; set; }
         
         /// <summary>
         /// When set to true, the Code Maturity Score for each product is returned, defaults to false.
         /// </summary>
-        private bool CodeMaturityScore { get; set; }
+        public bool CodeMaturityScore { get; set; }
         
         /// <summary>
         /// When set to true, the Cost of Ownership for each product is returned, defaults to false
         /// </summary>
-        private bool CostOfOwnership { get; set; }
+        public bool CostOfOwnership { get; set; }
         
         /// <summary>
         /// When set to true, the rating for each product is returned, defaults to false.
         /// </summary>
-        private bool Rating { get; set; }
+        public bool Rating { get; set; }
         
         /// <summary>
         /// When set to true, VTEM information for each product is returned, defaults to false.
         /// </summary>
-        private bool Vtems { get; set; }
+        public bool Vtems { get; set; }
 
         public ProductInformationOptions()
         {

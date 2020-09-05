@@ -68,6 +68,9 @@ namespace VulnDb.Net.Models
         [JsonPropertyName("name")]
         public string Name { get; set; }
         
+        [JsonPropertyName("products")]
+        public ProductInformation Products { get; set; }
+        
         /// <summary>
         /// The vendor short name
         /// </summary>

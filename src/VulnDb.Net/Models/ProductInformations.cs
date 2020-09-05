@@ -43,6 +43,9 @@ namespace VulnDb.Net.Models
         /// </summary>
         [JsonPropertyName("name")]
         public string Name { get; set; }
+        
+        [JsonPropertyName("versions")]
+        public VersionInformation Versions { get; set; }
 
         /// <summary>
         /// (optional) The rating for the product
