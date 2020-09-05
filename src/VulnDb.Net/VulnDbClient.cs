@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Drawing;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -364,6 +363,13 @@ namespace VulnDb.Net
         #endregion
 
         #region Pulling classifications information
+        /// <summary>
+        /// Returns 20 classifications ordered by name.
+        /// </summary>
+        /// <param name="options"></param>Optional parameter to indicate that you want to include each classification's type in the returned result
+        /// <param name="size"></param>The number of vendors to attempt returning, defaults to 20
+        /// <param name="page"></param>The page number
+        /// <returns></returns>
         public async Task<VulnDbResponse<ClassificationInformations?>> GetClassifications(
             ClassificationInformationOptions? options = null, int size = 20, int page = 1)
         {
@@ -372,7 +378,11 @@ namespace VulnDb.Net
             return classificationInformation;
         }
         #endregion
+
+        #region Pulling Vulnerability Information
         
+
+        #endregion
         #endregion
         
         #region API Request Helper Methods
