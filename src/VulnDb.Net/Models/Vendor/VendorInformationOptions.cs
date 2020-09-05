@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VulnDb.Net.Models
+﻿namespace VulnDb.Net.Models.Vendor
 {
     public class VendorInformationOptions : IObjectOptions
     {

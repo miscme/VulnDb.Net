@@ -1,4 +1,4 @@
-﻿namespace VulnDb.Net.Models
+﻿namespace VulnDb.Net.Models.Product
 {
     public class ProductInformationOptions : IObjectOptions
     {

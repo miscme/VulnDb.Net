@@ -1,9 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace VulnDb.Net.Models
+namespace VulnDb.Net.Models.Product
 {
-    
-    public class VersionInformations : IObjectInformations
+    public class ProductInformations : IObjectInformations
     {
         /// <summary>
         /// The result set total count
@@ -21,26 +20,12 @@ namespace VulnDb.Net.Models
         /// The results collection with the following parameters
         /// </summary>
         [JsonPropertyName("results")]
-        public VersionInformation[] Results { get; set; }
-    }
-    public class VersionInformation
-    {
-        /// <summary>
-        /// The version id
-        /// </summary>
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
-
-        /// <summary>
-        /// The version name
-        /// </summary>
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public ProductInformation Results { get; set; }
         
-        [JsonPropertyName("affected")]
-        public string Affected { get; set; }
-
-        [JsonPropertyName("cpe")]
-        public VersionInformation[] Cpe { get; set; }
+        /// <summary>
+        /// The product information
+        /// </summary>
+        [JsonPropertyName("product")] // TODO: get into results
+        public ProductInformation Product { get; set; }
     }
 }

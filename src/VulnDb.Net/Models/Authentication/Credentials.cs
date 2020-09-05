@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace VulnDb.Net.Models
+namespace VulnDb.Net.Models.Authentication
 {
     public class Credentials
     {
