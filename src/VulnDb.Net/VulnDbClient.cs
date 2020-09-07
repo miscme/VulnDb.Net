@@ -416,9 +416,18 @@ namespace VulnDb.Net
                 vulnDbResponse = new VulnDbResponse<T?>(null, error);
                 return vulnDbResponse;
             }
-            var serializer = new JsonSerializerOptions {IgnoreNullValues = true};
-            var responseModel = await response.Content.ReadFromJsonAsync<T?>(serializer);
-            vulnDbResponse = new VulnDbResponse<T?>(responseModel, null);
+
+            try
+            {
+                var serializer = new JsonSerializerOptions {IgnoreNullValues = true};
+                var responseModel = await response.Content.ReadFromJsonAsync<T?>(serializer);
+                vulnDbResponse = new VulnDbResponse<T?>(responseModel, error: null);
+            }
+            catch (JsonException e)
+            {
+                vulnDbResponse = new VulnDbResponse<T?>(null, exception: e);
+            }
+
             return vulnDbResponse;
         }
         
