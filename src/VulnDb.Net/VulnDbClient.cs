@@ -381,6 +381,14 @@ namespace VulnDb.Net
 
         #region Pulling Vulnerability Information
         
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesAllMetasploit(VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"vulnerabilities/find_all_metasploit?page={page.ToString()}&size={size.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
 
         #endregion
         #endregion
