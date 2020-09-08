@@ -364,7 +364,7 @@ namespace VulnDb.Net
         }
         #endregion
 
-        #region Pulling classifications information
+        #region Pulling Classifications information
         /// <summary>
         /// Returns 20 classifications ordered by name.
         /// </summary>
