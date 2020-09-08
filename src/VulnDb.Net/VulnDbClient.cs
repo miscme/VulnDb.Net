@@ -1,5 +1,7 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -380,8 +382,6 @@ namespace VulnDb.Net
         #endregion
 
         #region Pulling Vulnerability Information
-        
-        
         public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesAllMetasploit(VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
         {
             var url = $@"vulnerabilities/find_all_metasploit?page={page.ToString()}&size={size.ToString()}";
@@ -389,6 +389,89 @@ namespace VulnDb.Net
                 await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
             return vulnerabilityInformation;
         }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByBugtraqId(int bugtraqId, VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"vulnerabilities/{bugtraqId.ToString()}/find_by_bugtraq_id?page={page.ToString()}&size={size.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByCertvuId(int certvuId, VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"vulnerabilities/{certvuId.ToString()}/find_by_certvu_id?page={page.ToString()}&size={size.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByClassificationId(int classificationId, VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"vulnerabilities/{classificationId.ToString()}/find_by_classification_id?page={page.ToString()}&size={size.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByClassificationIds(IEnumerable<int> classificationIds, VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var urlIds = string.Join(",", classificationIds.Select(x => x.ToString()).ToArray());
+            var url = $@"vulnerabilities/{urlIds}/find_by_classification_ids?page={page.ToString()}&size={size.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByCpeId(string cpe, VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"vulnerabilities/find_by_cpe?page={page.ToString()}&size={size.ToString()}&cpe={cpe}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByCveId(int cveId, VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"vulnerabilities/{cveId.ToString()}/find_by_cve_id?page={page.ToString()}&size={size.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByDate(string startDate = "", string endDate = "", VulnerabilityInformationOptions? options = null,
+            int size = 20, int page = 1)
+        {
+            var url = $@"/vulnerabilities/find_by_date?start_date={startDate}&end_date={endDate}&size={size.ToString()}&page={page.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByExploitDbId(int exploitDbId, VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"vulnerabilities/{exploitDbId.ToString()}/find_by_exploitdb_id?page={page.ToString()}&size={size.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByIssId(int issId, VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"vulnerabilities/{issId.ToString()}/find_by_iss_id?page={page.ToString()}&size={size.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
+        public async Task<VulnDbResponse<VulnerabilityInformations?>> GetVulnerabilitiesFindByMilwormId(int milwormId, VulnerabilityInformationOptions? options = null, int size = 20, int page = 1)
+        {
+            var url = $@"vulnerabilities/{milwormId.ToString()}/find_by_milworm_id?page={page.ToString()}&size={size.ToString()}";
+            var vulnerabilityInformation =
+                await GetInformationAsync<VulnerabilityInformations, VulnerabilityInformationOptions>(url, options);
+            return vulnerabilityInformation;
+        }
+        
 
         #endregion
         #endregion
