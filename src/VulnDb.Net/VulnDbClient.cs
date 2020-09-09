@@ -1,6 +1,8 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -650,6 +652,13 @@ namespace VulnDb.Net
             catch (JsonException e)
             {
                 vulnDbResponse = new VulnDbResponse<T?>(null, exception: e);
+                
+                // DEBUGGING ONLY: FIXING SERIALIZATION ERROR
+                if (Debugger.IsAttached)
+                {
+                    var responseContent = response.Content.ReadAsByteArrayAsync().Result;
+                    var problemByte = Encoding.ASCII.GetString(responseContent.Skip(49).Take(30).ToArray());
+                }
             }
 
             return vulnDbResponse;
