@@ -652,15 +652,21 @@ namespace VulnDb.Net
             catch (JsonException e)
             {
                 vulnDbResponse = new VulnDbResponse<T?>(null, exception: e);
-                
+
+                #region Debugging code
                 // DEBUGGING ONLY: FIXING SERIALIZATION ERROR
+                // TODO: Remove debugging code
                 if (Debugger.IsAttached)
                 {
-                    var responseContent = response.Content.ReadAsByteArrayAsync().Result;
-                    var problemByte = Encoding.ASCII.GetString(responseContent.Skip(49).Take(30).ToArray());
+                    if (e.BytePositionInLine != null)
+                    {
+                        var responseContent = response.Content.ReadAsByteArrayAsync().Result;
+                        var problemBytes = Encoding.ASCII.GetString(responseContent.Skip((int)(e.BytePositionInLine) - 10).Take(30).ToArray());
+                    }
                 }
+                // END DEBUGGING SECTION
+                #endregion
             }
-
             return vulnDbResponse;
         }
         

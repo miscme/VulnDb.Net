@@ -19,7 +19,7 @@ namespace VulnDb.Net.Models.Product
         public string Name { get; set; }
         
         [JsonPropertyName("versions")]
-        public VersionInformation Versions { get; set; }
+        public VersionInformation[] Versions { get; set; }
 
         /// <summary>
         /// (optional) The rating for the product

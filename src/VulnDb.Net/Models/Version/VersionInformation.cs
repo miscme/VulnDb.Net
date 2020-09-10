@@ -17,7 +17,7 @@ namespace VulnDb.Net.Models.Version
         public string Name { get; set; }
         
         [JsonPropertyName("affected")]
-        public string Affected { get; set; }
+        public bool Affected { get; set; }
 
         [JsonPropertyName("cpe")]
         public VersionInformation[] Cpe { get; set; }

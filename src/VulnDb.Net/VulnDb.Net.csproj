@@ -6,6 +6,7 @@
 
     <ItemGroup>
       <PackageReference Include="System.Net.Http.Json" Version="3.2.1" />
+      <PackageReference Include="xunit.assert" Version="2.4.0" />
     </ItemGroup>
 
     <ItemGroup>
