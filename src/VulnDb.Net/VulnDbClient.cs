@@ -11,6 +11,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using VulnDb.Net.Converters;
 using VulnDb.Net.Models;
 using VulnDb.Net.Models.Authentication;
 using VulnDb.Net.Models.Classification;
@@ -645,7 +646,14 @@ namespace VulnDb.Net
 
             try
             {
-                var serializer = new JsonSerializerOptions {IgnoreNullValues = true};
+                var serializer = new JsonSerializerOptions
+                    {
+                        IgnoreNullValues = true, 
+                        Converters =
+                        {
+                            new BooleanConverter()
+                        }
+                    };
                 var responseModel = await response.Content.ReadFromJsonAsync<T?>(serializer);
                 vulnDbResponse = new VulnDbResponse<T?>(responseModel, error: null);
             }
