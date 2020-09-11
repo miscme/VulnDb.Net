@@ -8,10 +8,18 @@ namespace VulnDb.Net.Converters
     {
         public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var value = reader.GetString();
-            if (value.ToLower().Equals("true")) return true;
-            if (value.ToLower().Equals("false")) return false;
-            throw new JsonException($"Could not serialize {value} as bool with custom converter enabled");
+            try
+            {
+                var value = reader.GetString();
+                if (value.ToLower().Equals("true")) return true;
+                if (value.ToLower().Equals("false")) return false;
+            }
+            catch (InvalidOperationException)
+            {
+                return reader.GetBoolean();
+            }
+            throw new JsonException($"Could not serialize value as bool with custom converter enabled");
+
         }
 
         public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options) =>
