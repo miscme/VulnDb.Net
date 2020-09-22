@@ -1,6 +1,6 @@
 ﻿namespace VulnDb.Net.Clients
 {
-    public class ProductClient
+    public class ProductClient : IProductClient
     {
         
     }

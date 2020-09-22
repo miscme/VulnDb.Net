@@ -1,6 +1,6 @@
 ﻿namespace VulnDb.Net.Clients
 {
-    public class ClassificationsClient
+    public class ClassificationsClient : IClassificationsClient
     {
         
     }

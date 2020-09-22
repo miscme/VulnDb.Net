@@ -21,9 +21,9 @@ using VulnDb.Net.Models.Vendor;
 using VulnDb.Net.Models.Version;
 using VulnDb.Net.Models.Vulnerability;
 
-namespace VulnDb.Net
+namespace VulnDb.Net.Clients
 {
-    public class VulnDbClient : IDisposable
+    public class APIClient : IDisposable
     {
         private string BaseUrl { get; set; } = "https://vulndb.cyberriskanalytics.com/"; // TODO: Code set part to check for trailing / and add if not existent
         private string ApiVersionUrl { get; set; } = "api/v1/";
@@ -31,11 +31,11 @@ namespace VulnDb.Net
         private string? ClientSecret { get; }
         private readonly HttpClient _httpClient;
         
-        public VulnDbClient(string apiToken) : this(null, null, apiToken)
+        public APIClient(string apiToken) : this(null, null, apiToken)
         {
         }
 
-        public VulnDbClient(string? clientId, string? clientSecret, string? apiToken = null)
+        public APIClient(string? clientId, string? clientSecret, string? apiToken = null)
         {
             var clientHandler = new HttpClientHandler();
             var cookieContainer = new CookieContainer();
