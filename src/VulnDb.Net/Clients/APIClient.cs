@@ -178,7 +178,7 @@ namespace VulnDb.Net.Clients
         /// <typeparam name="T"></typeparam>The model type
         /// <typeparam name="TU"></typeparam>The options model type
         /// <returns></returns>
-        private async Task<VulnDbResponse<T?>> GetInformationAsync<T, TU>(string url, TU? options = null)
+        sealed protected async Task<VulnDbResponse<T?>> GetInformationAsync<T, TU>(string url, TU? options = null)
             where T : class, IObjectInformations where TU : class, IObjectOptions 
         {
             var optionObject = Activator.CreateInstance<TU>();
