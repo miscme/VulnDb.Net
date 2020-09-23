@@ -1,12 +1,17 @@
 ﻿#nullable enable
+using System.Net.Http;
 using System.Threading.Tasks;
 using VulnDb.Net.Models;
 using VulnDb.Net.Models.Vendor;
 
 namespace VulnDb.Net.Clients
 {
-    public sealed class VendorClient : APIClient, IVendorClient
+    public sealed class VendorClient : BaseClient, IVendorClient
     {
+        public VendorClient(HttpClient httpClient) : base(httpClient)
+        {
+        }
+
         public async Task<VulnDbResponse<VendorInformations?>> GetVendorByNameAsync(string vendorName,
             VendorInformationOptions? options = null)
         {

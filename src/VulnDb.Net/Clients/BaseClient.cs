@@ -23,93 +23,18 @@ using Xunit;
 
 namespace VulnDb.Net.Clients
 {
-    public class APIClient : IDisposable
+    public abstract class BaseClient : IDisposable
     {
-        private string BaseUrl { get; set; } = "https://vulndb.cyberriskanalytics.com/"; // TODO: Code set part to check for trailing / and add if not existent
-        private string ApiVersionUrl { get; set; } = "api/v1/";
-        private string? ClientId { get; }
-        private string? ClientSecret { get; }
-        private readonly HttpClient _httpClient;
+        public static string BaseUrl { get; set; } = "https://vulndb.cyberriskanalytics.com/"; // TODO: Code set part to check for trailing / and add if not existent
+        public static string ApiVersionUrl { get; set; } = "api/v1/";
+
+        protected readonly HttpClient _httpClient;
         
-        public APIClient(string apiToken) : this(null, null, apiToken)
+        public BaseClient(HttpClient httpClient)
         {
-            Assert.NotNull(apiToken);
+            _httpClient = httpClient;
         }
 
-        public APIClient(string? clientId, string? clientSecret, string? apiToken = null)
-        {
-            var clientHandler = new HttpClientHandler();
-            var cookieContainer = new CookieContainer();
-            clientHandler.CookieContainer = cookieContainer;
-            _httpClient = new HttpClient(clientHandler)
-            {
-                BaseAddress = new Uri(BaseUrl)
-            };
-            _httpClient.DefaultRequestHeaders.Referrer = new Uri(BaseUrl);
-            if (apiToken != null)
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                    "Bearer",
-                    apiToken);
-            }
-            else
-            {
-                ClientId ??= clientId;
-                ClientSecret ??= clientSecret;
-            }
-        }
-
-        /// <summary>
-        /// POST /oauth/token:
-        /// Requests a new token for your user account and adds the received value as an Authentication Header.
-        /// </summary>
-        public async Task GetTokenAsync()
-        {
-            var response = await SendMessageAsync("oauth/token", HttpMethod.Post, payload: new Credentials
-            {
-                ClientId = ClientId,
-                ClientSecret = ClientSecret
-            });
-
-            var token = await response.Content.ReadFromJsonAsync<Token>();
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", token.AccessToken);
-        }
-        
-        #region General API Information
-        /// <summary>
-        /// Returns status information on your user account,
-        /// including: organization name, username, e-mail address,
-        /// subscription end date, maximum number of allowed API calls per month,
-        /// API calls made for the current month and general VulnDB statistics. 
-        /// </summary>
-        /// <returns>Account Model</returns>
-        public async Task<VulnDbResponse<Account?>> GetAccountStatusAsync()
-        {
-            var response = await SendMessageAsync("account_status", HttpMethod.Get);
-            var vulnDbResponse = await GetVulnDbObject<Account>(response);
-            return vulnDbResponse;
-        }
-        
-        /// <summary>
-        /// Returns vendors, products and versions that have been merged within a date range.
-        /// The start_date(ISO 8601) parameter is required but the end_date is parameter is optional.
-        /// If the end_date(ISO 8601) parameter is omitted,
-        /// the records between start_date and the current date will be returned. 
-        /// </summary>
-        /// <param name="startDate">The start date (UTC), defaults to 10 years before today's d</param>
-        /// <param name="endDate">The end date (UTC), defaults to today's date</param>
-        /// <param name="size">The number of merged records to attempt returning, defaults to 20</param>
-        /// <param name="page">The page number</param>
-        /// <returns>MergedIds Model</returns>
-        public async Task<VulnDbResponse<MergedIds?>> GetMergedIdsAsync(string startDate = "", string endDate = "", int size = 20, int page = 1)
-        {
-            var urlParams = $@"start_date={startDate}&end_date={endDate}&size={size}&page={page}";
-            var response = await SendMessageAsync("get_merged_ids", HttpMethod.Get, urlParams);
-            var vulnDbResponse = await GetVulnDbObject<MergedIds>(response);
-            return vulnDbResponse;
-        }
-        #endregion
         
         #region API Request Helper Methods
         /// <summary>
@@ -119,7 +44,7 @@ namespace VulnDb.Net.Clients
         /// <param name="response"></param>Response from the request to VulnDb
         /// <typeparam name="T"></typeparam>Type of the response model
         /// <returns>Meta VulnDb Response Object</returns>
-        private async Task<VulnDbResponse<T?>> GetVulnDbObject<T>(HttpResponseMessage response)
+        protected async Task<VulnDbResponse<T?>> GetVulnDbObject<T>(HttpResponseMessage response)
             where T : class, IObjectInformations
         {
             VulnDbResponse<T?> vulnDbResponse;
@@ -178,12 +103,12 @@ namespace VulnDb.Net.Clients
         /// <typeparam name="T"></typeparam>The model type
         /// <typeparam name="TU"></typeparam>The options model type
         /// <returns></returns>
-        sealed protected async Task<VulnDbResponse<T?>> GetInformationAsync<T, TU>(string url, TU? options = null)
+        protected async Task<VulnDbResponse<T?>> GetInformationAsync<T, TU>(string url, TU? options = null)
             where T : class, IObjectInformations where TU : class, IObjectOptions 
         {
             var optionObject = Activator.CreateInstance<TU>();
             var reqUrl = options == null ? $@"{url}{optionObject}" : $@"{url}{options}";
-            var response = await SendMessageAsync(reqUrl,  HttpMethod.Get);
+            var response = await SendMessageAsync(_httpClient, reqUrl,  HttpMethod.Get);
             var vulnDbResponse = await GetVulnDbObject<T>(response);
             return vulnDbResponse;
         }
@@ -196,7 +121,7 @@ namespace VulnDb.Net.Clients
         /// <param name="urlParams"></param>The optional url parameters to use
         /// <param name="payload"></param>The optional payload to attach
         /// <returns></returns>
-        private async Task<HttpResponseMessage> SendMessageAsync(string url, HttpMethod httpMethod, string urlParams = "",
+        internal static async Task<HttpResponseMessage> SendMessageAsync(HttpClient httpClient, string url, HttpMethod httpMethod, string urlParams = "",
             object? payload = null)
         {
             var reqUrl = $"{BaseUrl}{ApiVersionUrl}{url}";
@@ -215,7 +140,7 @@ namespace VulnDb.Net.Clients
                 var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
                 request.Content = content;
             }
-            return await _httpClient.SendAsync(request);
+            return await httpClient.SendAsync(request);
         }
         #endregion
         

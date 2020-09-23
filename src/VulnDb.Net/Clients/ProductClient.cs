@@ -1,12 +1,16 @@
 ﻿#nullable enable
+using System.Net.Http;
 using System.Threading.Tasks;
 using VulnDb.Net.Models;
 using VulnDb.Net.Models.Product;
 
 namespace VulnDb.Net.Clients
 {
-    public class ProductClient : APIClient, IProductClient
+    public class ProductClient : BaseClient, IProductClient
     {
+        public ProductClient(HttpClient httpClient) : base(httpClient)
+        {
+        }
 
         public async Task<VulnDbResponse<ProductInformations?>> GetProductByVendorIdAsync(int vendorId,
             ProductInformationOptions? options = null, int size = 20, int page = 1)
