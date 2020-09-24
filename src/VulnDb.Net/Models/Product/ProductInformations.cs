@@ -20,7 +20,7 @@ namespace VulnDb.Net.Models.Product
         /// The results collection with the following parameters
         /// </summary>
         [JsonPropertyName("results")]
-        public ProductInformation Results { get; set; }
+        public ProductInformation[] Results { get; set; }
         
         /// <summary>
         /// The product information

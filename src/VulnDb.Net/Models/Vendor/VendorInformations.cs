@@ -19,7 +19,6 @@ namespace VulnDb.Net.Models.Vendor
         /// <summary>
         /// The results collection with the following parameters
         /// </summary>
-        /// 
         [JsonPropertyName("results")]
         public VendorInformation[] Results { get; set; }
         
@@ -50,6 +49,6 @@ namespace VulnDb.Net.Models.Vendor
         // }
 
         [JsonPropertyName("vendor")] // TODO: Add to Result
-        public VendorInformation Vendor { get; set; }
+        private VendorInformation Vendor { get; set; }
     }
 }
