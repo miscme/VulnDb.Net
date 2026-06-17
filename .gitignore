@@ -32,3 +32,10 @@ riderModule.iml
 
 # File-based project format
 *.iws
+
+# Redect developer files
+.vs/
+.idea/
+*.suo
+*.user
+VulnDB.Net.sln.DotSettings.user
